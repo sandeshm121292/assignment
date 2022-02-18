@@ -1,7 +1,7 @@
 version: '2'
 services:
   nginx:
-    build: ./nginx/
+    build: ./dockerassets/nginx/
     container_name: nginx-container
     ports:
       - "80:80"
@@ -11,7 +11,7 @@ services:
       - app-data
 
   php:
-    build: ./php/
+    build: ./dockerassets/php/
     container_name: php-container
     expose:
       - 9000
