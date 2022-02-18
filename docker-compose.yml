@@ -28,7 +28,7 @@ services:
       - .:/app
 
   app-data:
-    image: php:7.2-fpm
+    image: php:7.4-fpm
     container_name: app-data-container
     volumes:
       - .:/var/www/html/
