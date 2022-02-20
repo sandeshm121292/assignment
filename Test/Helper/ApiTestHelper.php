@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Assignment\Test\Helper;
 
@@ -10,27 +9,9 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 use Laminas\Diactoros\ServerRequest;
-use Assignment\Test\Helper\ApiTestEmitter;
 
 trait ApiTestHelper
 {
-    /**
-     * @param string $uri
-     * @param array  $parameters
-     * @param array  $headers
-     *
-     * @return ResponseInterface
-     * @throws Throwable
-     */
-    protected function dispatchGet(string $uri, array $parameters = [], array $headers = []): ResponseInterface
-    {
-        if ([] !== $parameters) {
-            $uri        .= '?' . http_build_query($parameters);
-            $parameters = [];
-        }
-
-        return $this->dispatch('GET', $uri, $parameters, $headers);
-    }
 
     /**
      * @param string $uri
@@ -98,6 +79,9 @@ trait ApiTestHelper
         return $emitter->getResponse();
     }
 
+    /**
+     * @return Router
+     */
     private function createRouter(): Router
     {
         $router = new Router();

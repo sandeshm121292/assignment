@@ -10,7 +10,7 @@ class DbConnectionException extends Exception
      * @param string $errorMessage
      * @return DbConnectionException
      */
-    public static function error(string $errorMessage): DbConnectionException
+    public static function create(string $errorMessage): DbConnectionException
     {
         return new self('Unable to connect to database : ' . $errorMessage);
     }

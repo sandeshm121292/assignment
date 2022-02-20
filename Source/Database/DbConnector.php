@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Assignment\Database;
 
@@ -60,7 +58,7 @@ class DbConnector
 
             return $pdo;
         } catch (Exception $exception) {
-            throw DbConnectionException::error($exception->getMessage());
+            throw DbConnectionException::create($exception->getMessage());
         }
     }
 }

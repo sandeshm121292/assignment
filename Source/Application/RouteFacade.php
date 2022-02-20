@@ -2,12 +2,11 @@
 
 namespace Assignment\Application;
 
-use Assignment\Health\Controller\HealthController;
+use Assignment\Order\Controller\OrderController;
 
 final class RouteFacade
 {
     private const POST = 'POST';
-    private const GET = 'GET';
 
     /**
      * @return array
@@ -16,9 +15,9 @@ final class RouteFacade
     {
         return [
             [
-                self::GET,
-                '/api/assignment/health',
-                [HealthController::class, 'index'],
+                self::POST,
+                '/api/invoice/create',
+                [OrderController::class, 'create'],
             ],
         ];
     }
