@@ -36,5 +36,4 @@ class CalculatorTest extends TestCase
     {
         return new ProductQuantityReference($productId, $quantity);
     }
-
 }

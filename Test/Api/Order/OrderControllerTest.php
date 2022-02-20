@@ -41,5 +41,4 @@ class OrderControllerTest extends TestCase
             $response->getStatusCode()
         );
     }
-
 }
