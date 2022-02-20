@@ -10,6 +10,13 @@
 
     docker-compose -f docker-compose.yml run composer install
 
+### Connect to mysql service using
+
+    docker exec -it mysql-container bash
+    mysql -u root -p root
+    use lamia_assignment;
+And run following DB queries to setup dummy data:
+
 ### DB Migration
 
     CREATE TABLE `products` (
@@ -22,10 +29,10 @@
 
     CREATE TABLE `product_taxes` (    
       `productId` varchar(255) NOT NULL DEFAULT '',
-      `country` varchar(2) NOT NULL DEFAULT '',
+      `countryCode` varchar(2) NOT NULL DEFAULT '',
       `tax` double NOT NULL,
       `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-      PRIMARY KEY (`productId`,`country`)
+      PRIMARY KEY (`productId`,`countryCode`)
     ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 ### Dummy data:
