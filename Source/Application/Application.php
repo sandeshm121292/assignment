@@ -2,12 +2,21 @@
 
 namespace Assignment\Application;
 
+use Assignment\Application\Exception\CannotRunApplicationException;
+use Exception;
 use League\Route\Router;
 use Psr\Http\Message\ServerRequestInterface;
-use Throwable;
 use Laminas\HttpHandlerRunner\Emitter\EmitterInterface;
 
-class Application
+/**
+ * Using simple routing library here, it will be lightweight and serves the purpose for this assignment
+ * Thinking of microservices approach here, so we don't require huge frameworks to run simple microservices.
+ *
+ * Potential improvement: Add middleware support.
+ *
+ * @link https://route.thephpleague.com/5.x/
+ */
+final class Application
 {
 
     /**
@@ -43,12 +52,16 @@ class Application
 
     /**
      * @return void
-     * @throws Throwable
+     * @throws CannotRunApplicationException
      */
     public function run(): void
     {
-        $response = $this->router->dispatch($this->request);
+        try {
+            $response = $this->router->dispatch($this->request);
 
-        $this->emitter->emit($response);
+            $this->emitter->emit($response);
+        } catch (Exception $exception) {
+            throw CannotRunApplicationException::create($exception);
+        }
     }
 }

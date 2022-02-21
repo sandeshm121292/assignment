@@ -2,10 +2,13 @@
 
 namespace Assignment\Order\Controller\Form;
 
+use Assignment\Form\FormInterface;
+use Assignment\Order\Controller\Form\Exception\EmptyRequestBodyException;
 use Assignment\Order\Controller\Form\Exception\FormValidationFailedException;
+use Assignment\Product\ProductQuantityReference;
 use Psr\Http\Message\ServerRequestInterface;
 
-class OrderForm
+class OrderForm implements FormInterface, OrderFormInterface
 {
     const PRODUCTS = 'products';
     const COUNTRY = 'country';
@@ -79,11 +82,17 @@ class OrderForm
     /**
      * @return void
      * @throws FormValidationFailedException
+     * @throws EmptyRequestBodyException
      */
     public function validate(): void
     {
         if (!$this->isValidated) {
             $bodyParams = $this->getRequestBodyAsParsedJson();
+
+            if ([] === $bodyParams) {
+                throw EmptyRequestBodyException::create('Empty request given');
+            }
+
             $this->validateProducts($bodyParams);
             $this->validateCountryCode($bodyParams);
             $this->validateInvoiceFormat($bodyParams);
@@ -100,6 +109,7 @@ class OrderForm
     /**
      * @return ProductQuantityReference[]
      * @throws FormValidationFailedException
+     * @throws EmptyRequestBodyException
      */
     public function getProducts(): array
     {
@@ -110,6 +120,7 @@ class OrderForm
     /**
      * @return string
      * @throws FormValidationFailedException
+     * @throws EmptyRequestBodyException
      */
     public function getCountry(): string
     {
@@ -120,6 +131,7 @@ class OrderForm
     /**
      * @return string
      * @throws FormValidationFailedException
+     * @throws EmptyRequestBodyException
      */
     public function getInvoiceFormat(): string
     {
@@ -130,6 +142,7 @@ class OrderForm
     /**
      * @return bool
      * @throws FormValidationFailedException
+     * @throws EmptyRequestBodyException
      */
     public function isSendEmail(): bool
     {
@@ -140,13 +153,13 @@ class OrderForm
     /**
      * @return string|null
      * @throws FormValidationFailedException
+     * @throws EmptyRequestBodyException
      */
     public function getEmail(): ?string
     {
         $this->validate();
         return $this->email;
     }
-
 
     /**
      * @return array

@@ -29,13 +29,12 @@ class OrderControllerTest extends TestCase
             "invoiceFormat" => "json",
             "isSendEmail" => false,
             "email" => ""
-
         ];
 
         $body = json_encode($requestBody);
 
-        $response = $this->dispatchPost('/api/invoice/create', $body);
-        var_dump(json_decode($response->getBody()->getContents()));
+        $response = $this->dispatchPost('/api/order/create', $body);
+
         self::assertSame(
             200,
             $response->getStatusCode()

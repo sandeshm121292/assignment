@@ -2,14 +2,30 @@
 
 namespace Assignment\Test\Integration\Order;
 
+use Assignment\Calculator\CalculatorFactory;
 use Assignment\Database\Exception\DbConnectionException;
-use Assignment\Order\Calculator\CalculatorFactory;
-use Assignment\Order\Controller\Form\ProductQuantityReference;
+use Assignment\Order\Resource\OrderResource;
 use Assignment\Product\Exception\CannotFindProductException;
+use Assignment\Product\ProductQuantityReference;
 use PHPUnit\Framework\TestCase;
 
 class CalculatorTest extends TestCase
 {
+    const PRODUCT_MILK = 'product-milk';
+    const PRODUCT_BREAD = 'product-bread';
+    const COUNTRY_FI = 'FI';
+
+    /**
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // In reality, we will prepare test data here.
+        // For now, we shall use the same data from the migration here.
+    }
+
 
     /**
      * @throws DbConnectionException
@@ -17,14 +33,18 @@ class CalculatorTest extends TestCase
      */
     public function testCalculate(): void
     {
+        $expectedGrandTotal = 34.34;
+        $expectedTotalTaxPrice = 4.64;
 
         $productQuantityReferences = [
-            $this->createProductQuantityReference('product-milk', 10),
-            $this->createProductQuantityReference('product-bread', 5),
+            $this->createProductQuantityReference(self::PRODUCT_MILK, 10),
+            $this->createProductQuantityReference(self::PRODUCT_BREAD, 5),
         ];
 
-
-        $calculatedOutcome = (new CalculatorFactory())->createCalculator($productQuantityReferences, 'FI')->calculate();
+        $calculatedOutcome = (new CalculatorFactory())->createCalculator($productQuantityReferences, self::COUNTRY_FI)->calculate();
+        self::assertInstanceOf(OrderResource::class, $calculatedOutcome);
+        self::assertEquals($expectedGrandTotal, $calculatedOutcome->getGrandTotal());
+        self::assertEquals($expectedTotalTaxPrice, $calculatedOutcome->getGrandTotalTaxPrice());
     }
 
     /**

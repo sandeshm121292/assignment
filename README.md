@@ -34,19 +34,35 @@ And run following DB queries to setup dummy data:
       `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       PRIMARY KEY (`productId`,`countryCode`)
     ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+    
+    CREATE TABLE `orders` (    
+      `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+      `orderId` varchar(255) NOT NULL DEFAULT '',
+      `productId` varchar(255) NOT NULL DEFAULT '',
+      `quantity` int(11) NOT NULL,
+      `basePrice` double NOT NULL,
+      `taxPrice` double NOT NULL,
+      `totalPrice` double NOT NULL,
+      `email` varchar(255) DEFAULT NULL,
+      `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      PRIMARY KEY (`id`),
+      UNIQUE KEY `productId` (`productId`,`orderId`),
+      KEY `orderId` (`orderId`)
+    ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
 
 ### Dummy data:
 
     INSERT INTO `products` (`id`, `title`, `price`)
     VALUES
-    ('product-bread', 'Bread', 2),
+    ('product-bread', 'Bread', 2.88),
     ('product-milk', 'Milk', 1.53);
 
     INSERT INTO `product_taxes` (`productId`, `countryCode`, `tax`)
     VALUES
-    	('product-milk', 'PL', 5),
+    	('product-bread', 'PL', 5),
     	('product-bread', 'FI', 12),
-    	('product-milk', 'FI', 12);
+    	('product-milk', 'PL', 10),
+    	('product-milk', 'FI', 19);
 
 ### Run tests
 
@@ -56,7 +72,7 @@ And run following DB queries to setup dummy data:
 ### Run API
 
 ###send as JSON response
-    curl -i --location --request POST 'http://127.0.0.1/api/invoice/create' \
+    curl -i --location --request POST 'http://127.0.0.1/api/order/create' \
     --header 'Content-Type: application/json' \
     --data-raw '{
     "products": [
@@ -76,7 +92,7 @@ And run following DB queries to setup dummy data:
     }'
 
 ###send as an email
-    curl -i --location --request POST 'http://127.0.0.1/api/invoice/create' \
+    curl -i --location --request POST 'http://127.0.0.1/api/order/create' \
     --header 'Content-Type: application/json' \
     --data-raw '{
     "products": [

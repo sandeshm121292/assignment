@@ -2,18 +2,26 @@
 
 namespace Assignment\Order\Controller;
 
+use Assignment\Application\JsonApiResponse;
+use Assignment\Calculator\CalculatedOutcome;
+use Assignment\Calculator\Calculator;
+use Assignment\Calculator\CalculatorFactory;
 use Assignment\Database\Exception\DbConnectionException;
-use Assignment\Order\Calculator\Calculator;
-use Assignment\Order\Calculator\CalculatorFactory;
+use Assignment\Email\EmailSenderFactory;
+use Assignment\Email\EmailSenderInterface;
+use Assignment\Formatter\FormatterInterface;
+use Assignment\Formatter\InvoiceFormatterProvider;
+use Assignment\Order\Controller\Form\Exception\EmptyRequestBodyException;
 use Assignment\Order\Controller\Form\Exception\FormValidationFailedException;
 use Assignment\Order\Controller\Form\OrderForm;
-use Assignment\Order\FormatterInterface;
-use Assignment\Order\FormatterProvider;
-use Assignment\Order\JsonApiResponse;
+use Assignment\Order\Controller\Form\OrderFormFactory;
+use Assignment\Order\Exception\CannotStoreOrderException;
+use Assignment\Order\OrderFactory;
+use Assignment\Order\OrderInterface;
 use Assignment\Order\Resource\OrderResource;
+use Assignment\Order\Resource\OrderResourceFactory;
 use Assignment\Product\Exception\CannotFindProductException;
 use Exception;
-use Laminas\Diactoros\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -23,24 +31,27 @@ final class OrderController
     /**
      * @param ServerRequestInterface $request
      * @return ResponseInterface
-     * @throws FormValidationFailedException
-     * @throws DbConnectionException
-     * @throws CannotFindProductException
      * @throws Exception
      */
     public function create(ServerRequestInterface $request): ResponseInterface
     {
-        $form = new OrderForm($request);
-        $form->validate();
-        $calculatedOutCome = $this->createCalculator($form->getProducts(), $form->getCountry())->calculate();
-        $isSendEmail = $form->isSendEmail();
-        $response = $this->createFormatter($form->getInvoiceFormat(), $isSendEmail, $calculatedOutCome)->getFormattedResponse();
+        try {
+            $form = $this->createOrderForm($request);
+            $form->validate();
 
-        if ($isSendEmail) {
-            mail($form->getEmail(), 'Invoice', $response);
+            $calculatedOutcomes = $this->getCalculatedOutcomes($form);
+            $orders = $this->storeCalculatedOrders($calculatedOutcomes, $form);
+            $orderResource = $this->createOrderResource($orders);
+            $formattedInvoice = $this->createInvoiceFormatter($form->getInvoiceFormat(), $orderResource)->getFormattedInvoice();
+
+            if ($form->isSendEmail()) {
+                $this->createEmailSender($form, $formattedInvoice)->send();
+            }
+
+            return new JsonApiResponse($formattedInvoice, 200);
+        } catch (Exception $exception) {
+            return $this->createJsonApiErrorResponse($exception);
         }
-
-        return new JsonApiResponse($response, 200);
     }
 
     /**
@@ -56,13 +67,86 @@ final class OrderController
 
     /**
      * @param string $getInvoiceFormat
-     * @param bool $isSendEmail
-     * @param OrderResource $calculatedOutCome
+     * @param OrderResource $orderResource
      * @return FormatterInterface
      * @throws Exception
      */
-    private function createFormatter(string $getInvoiceFormat, bool $isSendEmail, OrderResource $calculatedOutCome): FormatterInterface
+    private function createInvoiceFormatter(string $getInvoiceFormat, OrderResource $orderResource): FormatterInterface
     {
-        return (new FormatterProvider())->getFormatter($getInvoiceFormat, $isSendEmail, $calculatedOutCome);
+        return (new InvoiceFormatterProvider())->getFormatter($getInvoiceFormat, $orderResource);
+    }
+
+    /**
+     * @param OrderForm $form
+     * @param string $response
+     * @return EmailSenderInterface
+     * @throws FormValidationFailedException
+     * @throws EmptyRequestBodyException
+     */
+    private function createEmailSender(OrderForm $form, string $response): EmailSenderInterface
+    {
+        return (new EmailSenderFactory())->createEmailSender($form->getEmail(), 'Invoice', $response);
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @return OrderForm
+     */
+    private function createOrderForm(ServerRequestInterface $request): OrderForm
+    {
+        return (new OrderFormFactory())->createOrderForm($request);
+    }
+
+    /**
+     * @param Exception $exception
+     * @return JsonApiResponse
+     * @throws Exception
+     */
+    private function createJsonApiErrorResponse(Exception $exception): JsonApiResponse
+    {
+        return new JsonApiResponse(
+            json_encode(
+                [
+                    "data" => [
+                        "error" => $exception->getMessage(),
+                        "code" => $exception->getCode(),
+                    ]
+                ]
+            ),
+            $exception->getCode()
+        );
+    }
+
+    /**
+     * @param OrderInterface[] $orders
+     * @return OrderResource
+     */
+    private function createOrderResource(array $orders): OrderResource
+    {
+        return (new OrderResourceFactory())->createOrderResource($orders);
+    }
+
+    /**
+     * @param OrderForm $form
+     * @return CalculatedOutcome[]
+     * @throws DbConnectionException
+     * @throws EmptyRequestBodyException
+     * @throws FormValidationFailedException
+     * @throws CannotFindProductException
+     */
+    private function getCalculatedOutcomes(OrderForm $form): array
+    {
+        return $this->createCalculator($form->getProducts(), $form->getCountry())->calculate();
+    }
+
+    /**
+     * @param array $calculatedOutcomes
+     * @param OrderForm $form
+     * @return OrderInterface[]
+     * @throws CannotStoreOrderException
+     */
+    private function storeCalculatedOrders(array $calculatedOutcomes, OrderForm $form): array
+    {
+        return (new OrderFactory())->createOrderStorage($calculatedOutcomes, $form)->storeCalculatedOrders();
     }
 }

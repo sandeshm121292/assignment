@@ -1,21 +1,24 @@
 <?php declare(strict_types=1);
 
-namespace Assignment\Order\Calculator;
+namespace Assignment\Calculator;
 
 use Assignment\Database\Exception\DbConnectionException;
-use Assignment\Order\Resource\OrderResourceFactory;
 use Assignment\Product\ProductFactory;
 use Assignment\Product\ProductFinderInterface;
+use Assignment\Product\ProductQuantityReference;
 
 final class CalculatorFactory
 {
 
     /**
+     * @param ProductQuantityReference[] $products
+     * @param string $country
+     * @return Calculator
      * @throws DbConnectionException
      */
-    public function createCalculator($products, $country): Calculator
+    public function createCalculator(array $products, string $country): Calculator
     {
-        return new Calculator($this->createProductFinder(), $this->createCalculatedOutcomeFactory(), $this->createInvoiceResourceFactory(), $products, $country);
+        return new Calculator($this->createProductFinder(), $this->createCalculatedOutcomeFactory(), $products, $country);
     }
 
     /**
@@ -33,13 +36,5 @@ final class CalculatorFactory
     private function createCalculatedOutcomeFactory(): CalculatedOutcomeFactory
     {
         return new CalculatedOutcomeFactory();
-    }
-
-    /**
-     * @return OrderResourceFactory
-     */
-    private function createInvoiceResourceFactory(): OrderResourceFactory
-    {
-        return new OrderResourceFactory();
     }
 }

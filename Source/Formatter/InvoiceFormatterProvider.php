@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Assignment\Order;
+namespace Assignment\Formatter;
 
 use Exception;
 
-class FormatterProvider
+class InvoiceFormatterProvider
 {
 
     /**
@@ -13,11 +13,11 @@ class FormatterProvider
      * @return FormatterInterface
      * @throws Exception
      */
-    public function getFormatter($invoiceFormat, $isSendEmail, $resource): FormatterInterface
+    public function getFormatter($invoiceFormat, $resource): FormatterInterface
     {
         switch ($invoiceFormat) {
             case 'json':
-                return new JsonFormatter($resource, $isSendEmail);
+                return new JsonFormatter($resource);
             case 'html':
                 return new HtmlFormatter($resource);
             default:

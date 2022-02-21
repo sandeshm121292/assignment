@@ -1,15 +1,16 @@
-<?php declare(strict_types=1);
+<?php
 
-namespace Assignment\Order\Calculator;
+namespace Assignment\Calculator;
 
 use Assignment\Order\Resource\OrderResource;
 use Assignment\Product\Exception\CannotFindProductException;
 
 interface CalculatorInterface
 {
+
     /**
+     * @return CalculatedOutcome[]
      * @throws CannotFindProductException
-     * @return OrderResource
      */
-    public function calculate(): OrderResource;
+    public function calculate(): array;
 }

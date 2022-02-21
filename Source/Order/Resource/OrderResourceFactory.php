@@ -6,14 +6,11 @@ final class OrderResourceFactory
 {
 
     /**
-     * @param float $totalCost
-     * @param float $totalTaxCost
-     * @param array $calculatedOutcomes
+     * @param array $orders
      * @return OrderResource
      */
-    public function createInvoiceResource(float $totalCost, float $totalTaxCost, array $calculatedOutcomes): OrderResource
+    public function createOrderResource(array $orders): OrderResource
     {
-        return new OrderResource($totalCost, $totalTaxCost, $calculatedOutcomes);
+        return new OrderResource($orders);
     }
-
 }

@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Assignment\Order\Controller\Form;
+namespace Assignment\Product;
 
-class ProductQuantityReference
+final class ProductQuantityReference
 {
 
     /**

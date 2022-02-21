@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Assignment\Order\Calculator;
+namespace Assignment\Calculator;
 
-class CalculatedOutcome
+final class CalculatedOutcome
 {
 
     /**
@@ -18,32 +18,32 @@ class CalculatedOutcome
     /**
      * @var float
      */
-    private $unitCost;
+    private $basePrice;
 
     /**
      * @var float
      */
-    private $taxedCost;
+    private $taxPrice;
 
     /**
      * @var float
      */
-    private $totalCost;
+    private $totalPrice;
 
     /**
      * @param string $productId
      * @param int $quantity
-     * @param float $unitCost
-     * @param float $taxedCost
-     * @param float $totalCost
+     * @param float $basePrice
+     * @param float $taxPrice
+     * @param float $totalPrice
      */
-    public function __construct(string $productId, int $quantity, float $unitCost, float $taxedCost, float $totalCost)
+    public function __construct(string $productId, int $quantity, float $basePrice, float $taxPrice, float $totalPrice)
     {
         $this->productId = $productId;
         $this->quantity = $quantity;
-        $this->unitCost = $unitCost;
-        $this->taxedCost = $taxedCost;
-        $this->totalCost = $totalCost;
+        $this->basePrice = $basePrice;
+        $this->taxPrice = $taxPrice;
+        $this->totalPrice = $totalPrice;
     }
 
     /**
@@ -65,24 +65,24 @@ class CalculatedOutcome
     /**
      * @return float
      */
-    public function getUnitCost(): float
+    public function getBasePrice(): float
     {
-        return $this->unitCost;
+        return $this->basePrice;
     }
 
     /**
      * @return float
      */
-    public function getTaxedCost(): float
+    public function getTaxPrice(): float
     {
-        return $this->taxedCost;
+        return $this->taxPrice;
     }
 
     /**
      * @return float
      */
-    public function getTotalCost(): float
+    public function getTotalPrice(): float
     {
-        return $this->totalCost;
+        return $this->totalPrice;
     }
 }

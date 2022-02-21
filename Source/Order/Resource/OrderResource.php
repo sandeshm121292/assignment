@@ -2,59 +2,58 @@
 
 namespace Assignment\Order\Resource;
 
-use Assignment\Order\Calculator\CalculatedOutcome;
+use Assignment\Calculator\CalculatedOutcome;
+use Assignment\Order\OrderInterface;
 
-class OrderResource
+final class OrderResource
 {
 
     /**
-     * @var float
+     * @var OrderInterface[]
      */
-    private $totalCost;
+    private $orders;
 
     /**
-     * @var float
+     * @param OrderInterface[] $orders
      */
-    private $totalTaxCost;
-
-    /**
-     * @var CalculatedOutcome[]
-     */
-    private $calculatedOutComes;
-
-    /**
-     * @param float $totalCost
-     * @param float $totalTaxCost
-     * @param CalculatedOutcome[] $calculatedOutcomes
-     */
-    public function __construct(float $totalCost, float $totalTaxCost, array $calculatedOutcomes)
+    public function __construct(array $orders)
     {
-        $this->totalCost = $totalCost;
-        $this->totalTaxCost = $totalTaxCost;
-        $this->calculatedOutComes = $calculatedOutcomes;
+        $this->orders = $orders;
     }
 
     /**
      * @return float
      */
-    public function getTotalCost(): float
+    public function getGrandTotal(): float
     {
-        return $this->totalCost;
+        $total = 0;
+
+        foreach ($this->orders as $outcome) {
+            $total += $outcome->getTotalPrice();
+        }
+
+        return round($total, 2);
     }
 
     /**
      * @return float
      */
-    public function getTotalTaxCost(): float
+    public function getGrandTotalTaxPrice(): float
     {
-        return $this->totalTaxCost;
+        $total = 0;
+
+        foreach ($this->orders as $outcome) {
+            $total += $outcome->getTaxPrice();
+        }
+
+        return round($total, 2);
     }
 
     /**
      * @return CalculatedOutcome[]
      */
-    public function getCalculatedOutComes(): array
+    public function getOrders(): array
     {
-        return $this->calculatedOutComes;
+        return $this->orders;
     }
 }

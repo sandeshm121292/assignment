@@ -9,4 +9,3 @@ try {
 } catch (Throwable $exception) {
     http_response_code(500);
 }
-

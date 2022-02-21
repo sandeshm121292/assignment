@@ -6,27 +6,27 @@ use Assignment\Database\Exception\DbConnectionException;
 use Exception;
 use PDO;
 
-class DbConnector
+final class DbConnector
 {
     /**
      * @var string
      */
-    protected $dbName;
+    private $dbName;
 
     /**
      * @var string
      */
-    protected $dbUser;
+    private $dbUser;
 
     /**
      * @var string
      */
-    protected $dbPass;
+    private $dbPass;
 
     /**
      * @var string
      */
-    protected $dbHost;
+    private $dbHost;
 
     /**
      * @param string $dbName
@@ -58,7 +58,7 @@ class DbConnector
 
             return $pdo;
         } catch (Exception $exception) {
-            throw DbConnectionException::create($exception->getMessage());
+            throw DbConnectionException::create($exception);
         }
     }
 }

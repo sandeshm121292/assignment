@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Assignment\Order;
+namespace Assignment\Formatter;
 
 use Assignment\Order\Resource\OrderResource;
 

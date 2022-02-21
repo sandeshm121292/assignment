@@ -9,14 +9,20 @@ final class RouteFacade
     private const POST = 'POST';
 
     /**
+     * @link https://route.thephpleague.com/5.x/controllers/
+     *
      * @return array
      */
     public static function getRoutes(): array
     {
+        /**
+         * Want to add more endpoints? here's the place.
+         * Format: method, path, handler (class, function)
+         */
         return [
             [
                 self::POST,
-                '/api/invoice/create',
+                '/api/order/create',
                 [OrderController::class, 'create'],
             ],
         ];

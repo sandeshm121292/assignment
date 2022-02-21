@@ -4,14 +4,19 @@ namespace Assignment\Database\Exception;
 
 use Exception;
 
-class DbConnectionException extends Exception
+final class DbConnectionException extends Exception
 {
     /**
-     * @param string $errorMessage
+     * @param Exception $previous
      * @return DbConnectionException
      */
-    public static function create(string $errorMessage): DbConnectionException
+    public static function create(Exception $previous): DbConnectionException
     {
-        return new self('Unable to connect to database : ' . $errorMessage);
+        $message = sprintf('Cannot connect to db: %s', $previous->getMessage());
+        return new DbConnectionException(
+            $message,
+            $previous->getCode(),
+            $previous
+        );
     }
 }

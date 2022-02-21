@@ -1,14 +1,18 @@
 <?php
 declare(strict_types=1);
 
-namespace Assignment\Order;
+namespace Assignment\Application;
 
 use Exception;
-use Psr\Http\Message\StreamInterface;
 use Laminas\Diactoros\Exception\InvalidArgumentException;
 use Laminas\Diactoros\Response\TextResponse;
+use Psr\Http\Message\StreamInterface;
 
-class JsonApiResponse extends TextResponse
+/**
+ * I don't like this TBH, I ended up with issues using JsonResponse when handed strings as a body,
+ * for example anything containing a forward slash is interpreted as a resource identifier.
+ */
+final class JsonApiResponse extends TextResponse
 {
     private const HEADER_CONTENT_TYPE   = 'content-type';
     private const CONTENT_TYPE_API_JSON = 'application/vnd.api+json';

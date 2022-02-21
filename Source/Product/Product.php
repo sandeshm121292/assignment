@@ -58,15 +58,23 @@ class Product implements ProductInterface, ProductFinderInterface
      */
     public function findProduct(string $id, string $countryCode): ProductInterface
     {
+        /**
+         * Hardcoded sql queries are old school, we should have some query builder library in reality
+         */
         $query = <<<SQL
 SELECT p.*, pt.tax, pt.countryCode FROM products AS p
 INNER JOIN product_taxes AS pt ON p.id = pt.productId
-WHERE p.id = "%s" AND pt.countryCode = "%s"
+WHERE p.id = :productId AND pt.countryCode = :countryCode
 SQL;
 
         try {
-            $queryString = sprintf($query, $id, $countryCode);
-            $productArray = $this->db->query($queryString)->fetch(PDO::FETCH_ASSOC);
+            $statement = $this->db->prepare($query);
+            $statement->execute([
+                ':productId' => $id,
+                ':countryCode' => $countryCode,
+            ]);
+
+            $productArray = $statement->fetch(PDO::FETCH_ASSOC);
 
             if (false === $productArray) {
                 throw MissingProductException::create($id, $countryCode);
