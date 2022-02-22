@@ -58,7 +58,7 @@ final class OrderControllerTest extends BaseApiTest
      * @return void
      * @throws Throwable
      */
-    public function testCreateJson(): void
+    public function testCreateReturnAsJson(): void
     {
         $requestBody = [
             "products" => [
@@ -95,7 +95,7 @@ final class OrderControllerTest extends BaseApiTest
      * @return void
      * @throws Throwable
      */
-    public function testCreateHtml(): void
+    public function testCreateAsHtml(): void
     {
         $requestBody = [
             "products" => [
