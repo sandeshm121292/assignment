@@ -35,7 +35,14 @@ And run following DB queries to setup dummy data:
       PRIMARY KEY (`productId`,`countryCode`)
     ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
     
-    CREATE TABLE `orders` (    
+    CREATE TABLE `orders` (        
+      `id` varchar(255) NOT NULL DEFAULT '',
+      `email` varchar(255) DEFAULT NULL,
+      PRIMARY KEY (`id`),
+      UNIQUE KEY `email` (`email`,`id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+    CREATE TABLE `order_items` (     
       `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
       `orderId` varchar(255) NOT NULL DEFAULT '',
       `productId` varchar(255) NOT NULL DEFAULT '',
@@ -43,12 +50,11 @@ And run following DB queries to setup dummy data:
       `basePrice` double NOT NULL,
       `taxPrice` double NOT NULL,
       `totalPrice` double NOT NULL,
-      `email` varchar(255) DEFAULT NULL,
       `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       PRIMARY KEY (`id`),
       UNIQUE KEY `productId` (`productId`,`orderId`),
       KEY `orderId` (`orderId`)
-    ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+    ) ENGINE=InnoDB AUTO_INCREMENT=69 DEFAULT CHARSET=latin1;
 
 ### Dummy data:
 
@@ -65,10 +71,8 @@ And run following DB queries to setup dummy data:
     	('product-milk', 'FI', 19);
 
 ### Run tests
-
     docker-compose -f docker-compose.yml run php vendor/bin/phpunit Test/
    
-
 ### Run API
 
 ###send as JSON response

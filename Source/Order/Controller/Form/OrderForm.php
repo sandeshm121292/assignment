@@ -226,6 +226,7 @@ class OrderForm implements FormInterface, OrderFormInterface
             $this->addError(self::PRODUCTS, 'No products given');
         }
 
+        // Improvement: here we can go a step further and test no duplicate productId is given and every product has quantity.
         $this->products = $this->createProductQuantityReferences($products);
     }
 

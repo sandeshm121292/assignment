@@ -32,7 +32,7 @@ class ConsolidatedCalculationOutcome
     /**
      * @param float $preCalculationTotal
      */
-    public function setPreCalculationTotal(float $preCalculationTotal): void
+    public function setPreCalculationPrice(float $preCalculationTotal): void
     {
         $this->preCalculationTotal = $preCalculationTotal;
     }
@@ -40,7 +40,7 @@ class ConsolidatedCalculationOutcome
     /**
      * @param float $postCalculationTotal
      */
-    public function setPostCalculationTotal(float $postCalculationTotal): void
+    public function setPostCalculationPrice(float $postCalculationTotal): void
     {
         $this->postCalculationTotal = $postCalculationTotal;
     }

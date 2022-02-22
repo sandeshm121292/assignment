@@ -61,12 +61,12 @@ abstract class AbstractCalculator implements CalculatorInterface
     /**
      * @return float
      */
-    abstract protected function performPreCalculation(): float;
+    abstract protected function getPreCalculationPrice(): float;
 
     /**
      * @return float
      */
-    abstract protected function performPostCalculation(): float;
+    abstract protected function getPostCalculationPrice(): float;
 
     /**
      * @inheritDoc
@@ -74,12 +74,12 @@ abstract class AbstractCalculator implements CalculatorInterface
     public function calculate(): ConsolidatedCalculationOutcome
     {
         try {
-            $consolidatedCalculationOutcome = $this->createConsolidatedCalculationOutcome();
-            $consolidatedCalculationOutcome->setPreCalculationTotal($this->performPreCalculation());
-            $this->addProductCalculationOutcomes($consolidatedCalculationOutcome);
-            $consolidatedCalculationOutcome->setPostCalculationTotal($this->performPostCalculation());
+            $outcome = $this->createConsolidatedCalculationOutcome();
+            $outcome->setPreCalculationPrice($this->getPreCalculationPrice());
+            $this->addProductCalculationOutcomes($outcome);
+            $outcome->setPostCalculationPrice($this->getPostCalculationPrice());
 
-            return $consolidatedCalculationOutcome;
+            return $outcome;
         } catch (Exception $exception) {
             throw CannotCalculateException::create($exception);
         }

@@ -53,14 +53,27 @@ final class OrderController
     }
 
     /**
-     * @param array $products
-     * @param string $countryCode
-     * @return AbstractCalculator
+     * @param OrderForm $form
+     * @return ConsolidatedCalculationOutcome
+     * @throws CannotFindProductException
      * @throws DbConnectionException
+     * @throws EmptyRequestBodyException
+     * @throws FormValidationFailedException
      */
-    private function createCalculator(array $products, string $countryCode): AbstractCalculator
+    private function getCalculatedOutcome(OrderForm $form): ConsolidatedCalculationOutcome
     {
-        return (new CalculatorFactory())->createCalculator($products, $countryCode);
+        return (new CalculatorFactory())->createCalculator($form->getProducts(), $form->getCountry())->calculate();
+    }
+
+    /**
+     * @param ConsolidatedCalculationOutcome $consolidatedCalculationOutcome
+     * @param OrderForm $form
+     * @return OrderInterface
+     * @throws CannotStoreOrderException
+     */
+    private function storeOrder(ConsolidatedCalculationOutcome $consolidatedCalculationOutcome, OrderForm $form): OrderInterface
+    {
+        return (new OrderFactory())->createOrderStorage($consolidatedCalculationOutcome, $form)->storeCalculatedOrder();
     }
 
     /**
@@ -114,30 +127,5 @@ final class OrderController
             ),
             $exception->getCode()
         );
-    }
-
-    /**
-     * @param OrderForm $form
-     * @return ConsolidatedCalculationOutcome
-     * @throws CannotFindProductException
-     * @throws DbConnectionException
-     * @throws EmptyRequestBodyException
-     * @throws FormValidationFailedException
-     */
-    private function getCalculatedOutcome(OrderForm $form): ConsolidatedCalculationOutcome
-    {
-        return $this->createCalculator($form->getProducts(), $form->getCountry())->calculate();
-    }
-
-
-    /**
-     * @param ConsolidatedCalculationOutcome $consolidatedCalculationOutcome
-     * @param OrderForm $form
-     * @return OrderInterface
-     * @throws CannotStoreOrderException
-     */
-    private function storeOrder(ConsolidatedCalculationOutcome $consolidatedCalculationOutcome, OrderForm $form): OrderInterface
-    {
-        return (new OrderFactory())->createOrderStorage($consolidatedCalculationOutcome, $form)->storeCalculatedOrder();
     }
 }

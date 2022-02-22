@@ -23,7 +23,6 @@ services:
   composer:
     restart: 'no'
     image: prooph/composer:7.2
-    command: [install, update]
     volumes:
       - .:/app
 
