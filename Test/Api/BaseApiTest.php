@@ -4,7 +4,7 @@ namespace Assignment\Test\Api;
 
 use Assignment\Test\Integration\BaseIntegrationTest;
 
-class BaseApiTest extends BaseIntegrationTest
+abstract class BaseApiTest extends BaseIntegrationTest
 {
 
 }

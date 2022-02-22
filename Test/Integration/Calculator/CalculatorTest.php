@@ -41,6 +41,11 @@ final class CalculatorTest extends BaseIntegrationTest
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->clearProducts(self::PRODUCT_MILK, self::MILK_COUNTRY_PL);
+        $this->clearProducts(self::PRODUCT_MILK, self::MILK_COUNTRY_FI);
+        $this->clearProducts(self::PRODUCT_BREAD, self::MILK_COUNTRY_FI);
+
         $this->storeProduct(self::PRODUCT_MILK, self::MILK_PRICE, self::MILK_COUNTRY_PL, self::MILK_TAX_PL);
         $this->storeProduct(self::PRODUCT_MILK, self::MILK_PRICE, self::MILK_COUNTRY_FI, self::MILK_TAX_FI);
         $this->storeProduct(self::PRODUCT_BREAD, self::BREAD_PRICE, self::BREAD_COUNTRY, self::BREAD_TAX);

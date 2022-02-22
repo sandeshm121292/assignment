@@ -7,7 +7,7 @@ use Assignment\Database\Exception\DbConnectionException;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
-class BaseIntegrationTest extends TestCase
+abstract class BaseIntegrationTest extends TestCase
 {
 
     /**
