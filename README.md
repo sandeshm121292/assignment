@@ -76,6 +76,7 @@ And run following DB queries to setup dummy data:
 ### Run API
 
 ###send as JSON response
+
     curl -i --location --request POST 'http://127.0.0.1/api/order/create' \
     --header 'Content-Type: application/json' \
     --data-raw '{
@@ -96,6 +97,7 @@ And run following DB queries to setup dummy data:
     }'
 
 ###send as an email
+
     curl -i --location --request POST 'http://127.0.0.1/api/order/create' \
     --header 'Content-Type: application/json' \
     --data-raw '{
