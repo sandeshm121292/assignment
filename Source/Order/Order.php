@@ -6,7 +6,10 @@ use Assignment\Order\Exception\CannotStoreOrderException;
 use Exception;
 use PDO;
 
-class Order implements OrderInterface, OrderStorageInterface
+/**
+ * @see \Assignment\Test\Integration\Order\OrderTest
+ */
+final class Order implements OrderInterface, OrderStorageInterface
 {
 
     /**

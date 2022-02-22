@@ -9,9 +9,9 @@ interface ProductFinderInterface
     /**
      * @param string $id
      * @param string $countryCode
-     * @return ProductInterface
+     * @return ProductInterface|null
      *
      * @throws CannotFindProductException
      */
-    public function findProduct(string $id, string $countryCode): ProductInterface;
+    public function findProduct(string $id, string $countryCode): ?ProductInterface;
 }

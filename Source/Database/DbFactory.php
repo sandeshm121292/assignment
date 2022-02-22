@@ -28,6 +28,11 @@ final class DbFactory
     private const DB_HOST = 'mysql';
 
     /**
+     * @var PDO
+     */
+    private $db;
+
+    /**
      * @return PDO
      * @throws DbConnectionException
      *
@@ -35,6 +40,10 @@ final class DbFactory
      */
     public function createPDO(): PDO
     {
-        return (new DbConnector(self::DB_NAME, self::DB_USER, self::DB_PASSWORD, self::DB_HOST))->connect();
+        if (null === $this->db) {
+            $this->db = (new DbConnector(self::DB_NAME, self::DB_USER, self::DB_PASSWORD, self::DB_HOST))->connect();
+        }
+
+        return $this->db;
     }
 }

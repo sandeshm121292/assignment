@@ -4,6 +4,7 @@ namespace Assignment\Calculator;
 
 use Assignment\Calculator\Exception\CannotCalculateException;
 use Assignment\Product\Exception\CannotFindProductException;
+use Assignment\Product\Exception\MissingProductException;
 use Assignment\Product\ProductFinderInterface;
 use Assignment\Product\ProductQuantityReference;
 use Exception;
@@ -73,16 +74,12 @@ abstract class AbstractCalculator implements CalculatorInterface
      */
     public function calculate(): ConsolidatedCalculationOutcome
     {
-        try {
-            $outcome = $this->createConsolidatedCalculationOutcome();
-            $outcome->setPreCalculationPrice($this->getPreCalculationPrice());
-            $this->addProductCalculationOutcomes($outcome);
-            $outcome->setPostCalculationPrice($this->getPostCalculationPrice());
+        $outcome = $this->createConsolidatedCalculationOutcome();
+        $outcome->setPreCalculationPrice($this->getPreCalculationPrice());
+        $this->addProductCalculationOutcomes($outcome);
+        $outcome->setPostCalculationPrice($this->getPostCalculationPrice());
 
-            return $outcome;
-        } catch (Exception $exception) {
-            throw CannotCalculateException::create($exception);
-        }
+        return $outcome;
     }
 
     /**
@@ -93,23 +90,37 @@ abstract class AbstractCalculator implements CalculatorInterface
     private function addProductCalculationOutcomes(ConsolidatedCalculationOutcome $consolidatedCalculationOutcome): void
     {
         foreach ($this->products as $productQuantityReference) {
-            $productId = $productQuantityReference->getProductId();
-            $quantity = $productQuantityReference->getQuantity();
-            $product = $this->productFinder->findProduct($productId, $this->countryCode);
+            try {
+                $productId = $productQuantityReference->getProductId();
+                $quantity = $productQuantityReference->getQuantity();
 
-            $unitTotalPrice = round($product->getPrice() * $quantity, 2);
-            $taxedPrice = round(($unitTotalPrice / 100) * $product->getTax(), 2);
-            $totalPrice = $unitTotalPrice + $taxedPrice;
+                if ($quantity < 1) {
+                    throw new Exception(sprintf('Quantity must be positive number: %s given', $quantity));
+                }
 
-            $consolidatedCalculationOutcome->addProductCalculationOutcome(
-                $this->calculatedOutcomeFactory->createCalculatedOutcome(
-                    $productId,
-                    $quantity,
-                    $unitTotalPrice,
-                    $taxedPrice,
-                    $totalPrice
-                )
-            );
+                $product = $this->productFinder->findProduct($productId, $this->countryCode);
+
+                if (null === $product) {
+                    throw MissingProductException::create($productId, $this->countryCode);
+                }
+
+                $basePrice = round($product->getPrice() * $quantity, 2);
+
+                $taxedPrice = round(($basePrice / 100) * $product->getTax(), 2);
+                $totalPrice = $basePrice + $taxedPrice;
+
+                $consolidatedCalculationOutcome->addProductCalculationOutcome(
+                    $this->calculatedOutcomeFactory->createCalculatedOutcome(
+                        $productId,
+                        $quantity,
+                        $basePrice,
+                        $taxedPrice,
+                        $totalPrice
+                    )
+                );
+            } catch (Exception $exception) {
+                throw CannotCalculateException::create($exception);
+            }
         }
     }
 

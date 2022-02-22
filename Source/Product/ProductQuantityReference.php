@@ -11,7 +11,7 @@ final class ProductQuantityReference
     private $productId;
 
     /**
-     * @var integer
+     * @var int
      */
     private $quantity;
 

@@ -56,7 +56,7 @@ class Product implements ProductInterface, ProductFinderInterface
     /**
      * @inheritDoc
      */
-    public function findProduct(string $id, string $countryCode): ProductInterface
+    public function findProduct(string $id, string $countryCode): ?ProductInterface
     {
         /**
          * Hardcoded sql queries are old school, we should have some query builder library in reality
@@ -74,13 +74,9 @@ SQL;
                 ':countryCode' => $countryCode,
             ]);
 
-            $productArray = $statement->fetch(PDO::FETCH_ASSOC);
+            $product = $statement->fetch(PDO::FETCH_ASSOC);
 
-            if (false === $productArray) {
-                throw MissingProductException::create($id, $countryCode);
-            }
-
-            return $this->createProductFromArray($productArray);
+            return $product ? $this->createProductFromArray($product) : null;
         } catch (Exception $exception) {
             throw CannotFindProductException::create($id, $countryCode, $exception);
         }

@@ -61,7 +61,7 @@ class ConsolidatedCalculationOutcome
         $total = 0;
 
         foreach ($this->productCalculationOutcomes as $outcome) {
-            $total += $outcome->getTaxPrice();
+            $total += $outcome->getTotalPrice();
         }
 
         $total = round($total, 2);
