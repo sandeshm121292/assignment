@@ -6,48 +6,23 @@ use Assignment\Order\Exception\CannotStoreOrderException;
 use Exception;
 use PDO;
 
-final class Order implements OrderInterface, OrderStorageInterface
+class Order implements OrderInterface, OrderStorageInterface
 {
-
-    /**
-     * @var string
-     */
-    private $orderId;
-
-    /**
-     * @var string
-     */
-    private $productId;
-
-    /**
-     * @var int
-     */
-    private $quantity;
-
-    /**
-     * @var float
-     */
-    private $basePrice;
-
-    /**
-     * @var float
-     */
-    private $taxPrice;
-
-    /**
-     * @var float
-     */
-    private $totalPrice;
-
-    /**
-     * @var string|null
-     */
-    private $email;
 
     /**
      * @var PDO
      */
     private $db;
+
+    /**
+     * @var string
+     */
+    private $id;
+
+    /**
+     * @var string|null
+     */
+    private $email;
 
     /**
      * @param PDO $db
@@ -58,55 +33,25 @@ final class Order implements OrderInterface, OrderStorageInterface
     }
 
     /**
-     * @inheritDoc
+     * @return string
      */
-    public function getOrderId(): string
+    public function getId(): string
     {
-        return $this->orderId;
+        return $this->id;
     }
 
     /**
-     * @inheritDoc
+     * @param string $id
+     * @return Order
      */
-    public function getProductId(): string
+    public function setId(string $id): Order
     {
-        return $this->productId;
+        $this->id = $id;
+        return $this;
     }
 
     /**
-     * @inheritDoc
-     */
-    public function getQuantity(): int
-    {
-        return $this->quantity;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getBasePrice(): float
-    {
-        return $this->basePrice;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getTaxPrice(): float
-    {
-        return $this->taxPrice;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getTotalPrice(): float
-    {
-        return $this->totalPrice;
-    }
-
-    /**
-     * @inheritDoc
+     * @return string|null
      */
     public function getEmail(): ?string
     {
@@ -114,77 +59,18 @@ final class Order implements OrderInterface, OrderStorageInterface
     }
 
     /**
-     * @param string $orderId
-     * @return Order
-     */
-    public function setOrderId(string $orderId): self
-    {
-        $this->orderId = $orderId;
-        return $this;
-    }
-
-    /**
-     * @param string $productId
-     * @return Order
-     */
-    public function setProductId(string $productId): self
-    {
-        $this->productId = $productId;
-        return $this;
-    }
-
-    /**
-     * @param int $quantity
-     * @return Order
-     */
-    public function setQuantity(int $quantity): self
-    {
-        $this->quantity = $quantity;
-        return $this;
-    }
-
-    /**
-     * @param float $basePrice
-     * @return Order
-     */
-    public function setBasePrice(float $basePrice): self
-    {
-        $this->basePrice = $basePrice;
-        return $this;
-    }
-
-    /**
-     * @param float $taxPrice
-     * @return Order
-     */
-    public function setTaxPrice(float $taxPrice): self
-    {
-        $this->taxPrice = $taxPrice;
-        return $this;
-    }
-
-    /**
-     * @param float $totalPrice
-     * @return Order
-     */
-    public function setTotalPrice(float $totalPrice): self
-    {
-        $this->totalPrice = $totalPrice;
-        return $this;
-    }
-
-    /**
      * @param string|null $email
      * @return Order
      */
-    public function setEmail(?string $email): self
+    public function setEmail(?string $email): Order
     {
         $this->email = $email;
         return $this;
     }
 
     /**
-     * @inheritDoc
+     * @return OrderInterface
+     * @throws CannotStoreOrderException
      */
     public function store(): OrderInterface
     {
@@ -193,18 +79,13 @@ final class Order implements OrderInterface, OrderStorageInterface
              * Hardcoded sql queries are old school, we should have some query builder library in reality
              */
             $query = <<<SQL
-INSERT INTO `orders` (`orderId`, `productId`, `quantity`, `basePrice`, `taxPrice`, `totalPrice`, `email`)
-VALUES (:orderId, :productId, :quantity, :basePrice, :taxPrice, :totalPrice, :email);        
+INSERT INTO `orders` (`id`, `email`)
+VALUES (:id, :email);        
 SQL;
 
             $statement = $this->db->prepare($query);
             $statement->execute([
-                ':orderId' => $this->getOrderId(),
-                ':productId' => $this->getProductId(),
-                ':quantity' => $this->getQuantity(),
-                ':basePrice' => $this->getBasePrice(),
-                ':taxPrice' => $this->getTaxPrice(),
-                ':totalPrice' => $this->getTotalPrice(),
+                ':id' => $this->getId(),
                 ':email' => $this->getEmail(),
             ]);
 

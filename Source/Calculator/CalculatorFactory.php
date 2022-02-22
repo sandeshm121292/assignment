@@ -13,12 +13,18 @@ final class CalculatorFactory
     /**
      * @param ProductQuantityReference[] $products
      * @param string $country
-     * @return Calculator
+     * @return AbstractCalculator
      * @throws DbConnectionException
      */
-    public function createCalculator(array $products, string $country): Calculator
+    public function createCalculator(array $products, string $country): AbstractCalculator
     {
-        return new Calculator($this->createProductFinder(), $this->createCalculatedOutcomeFactory(), $products, $country);
+        return new Calculator(
+            $this->createProductFinder(),
+            $this->createCalculatedOutcomeFactory(),
+            $this->createConsolidatedCalculationOutcomeFactory(),
+            $products,
+            $country
+        );
     }
 
     /**
@@ -31,10 +37,18 @@ final class CalculatorFactory
     }
 
     /**
-     * @return CalculatedOutcomeFactory
+     * @return ProductCalculationOutcomeFactory
      */
-    private function createCalculatedOutcomeFactory(): CalculatedOutcomeFactory
+    private function createCalculatedOutcomeFactory(): ProductCalculationOutcomeFactory
     {
-        return new CalculatedOutcomeFactory();
+        return new ProductCalculationOutcomeFactory();
+    }
+
+    /**
+     * @return ConsolidatedCalculationOutcomeFactory
+     */
+    private function createConsolidatedCalculationOutcomeFactory(): ConsolidatedCalculationOutcomeFactory
+    {
+        return new ConsolidatedCalculationOutcomeFactory();
     }
 }

@@ -2,15 +2,14 @@
 
 namespace Assignment\Calculator;
 
-use Assignment\Order\Resource\OrderResource;
 use Assignment\Product\Exception\CannotFindProductException;
 
 interface CalculatorInterface
 {
 
     /**
-     * @return CalculatedOutcome[]
+     * @return ConsolidatedCalculationOutcome
      * @throws CannotFindProductException
      */
-    public function calculate(): array;
+    public function calculate(): ConsolidatedCalculationOutcome;
 }

@@ -2,14 +2,20 @@
 
 namespace Assignment\Order;
 
-use Assignment\Calculator\CalculatedOutcome;
+use Assignment\Calculator\ConsolidatedCalculationOutcome;
 use Assignment\Database\DbFactory;
 use Assignment\Database\Exception\DbConnectionException;
 use Assignment\Order\Controller\Form\OrderForm;
+use Assignment\Order\Item\OrderItem;
 use PDO;
 
-class OrderFactory
+final class OrderFactory
 {
+
+    /**
+     * @var PDO
+     */
+    private $db;
 
     /**
      * @return Order
@@ -21,13 +27,22 @@ class OrderFactory
     }
 
     /**
-     * @param CalculatedOutcome[] $calculatedOutcomes
+     * @return OrderItem
+     * @throws DbConnectionException
+     */
+    public function createOrderItem(): OrderItem
+    {
+        return new OrderItem($this->createDb());
+    }
+
+    /**
+     * @param ConsolidatedCalculationOutcome $consolidatedCalculationOutcome
      * @param OrderForm $form
      * @return OrderStorage
      */
-    public function createOrderStorage(array $calculatedOutcomes, OrderForm $form): OrderStorage
+    public function createOrderStorage(ConsolidatedCalculationOutcome $consolidatedCalculationOutcome, OrderForm $form): OrderStorage
     {
-        return new OrderStorage($calculatedOutcomes, new OrderFactory(), $form);
+        return new OrderStorage($consolidatedCalculationOutcome, new OrderFactory(), $form);
     }
 
     /**
@@ -36,6 +51,10 @@ class OrderFactory
      */
     private function createDb(): PDO
     {
-        return (new DbFactory())->createPDO();
+        if (null === $this->db) {
+            $this->db = (new DbFactory())->createPDO();
+        }
+
+        return $this->db;
     }
 }

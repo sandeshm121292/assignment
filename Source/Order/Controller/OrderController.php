@@ -3,12 +3,13 @@
 namespace Assignment\Order\Controller;
 
 use Assignment\Application\JsonApiResponse;
-use Assignment\Calculator\CalculatedOutcome;
-use Assignment\Calculator\Calculator;
+use Assignment\Calculator\AbstractCalculator;
 use Assignment\Calculator\CalculatorFactory;
+use Assignment\Calculator\ConsolidatedCalculationOutcome;
 use Assignment\Database\Exception\DbConnectionException;
 use Assignment\Email\EmailSenderFactory;
 use Assignment\Email\EmailSenderInterface;
+use Assignment\Formatter\Exception\InvalidInvoiceFormatException;
 use Assignment\Formatter\FormatterInterface;
 use Assignment\Formatter\InvoiceFormatterProvider;
 use Assignment\Order\Controller\Form\Exception\EmptyRequestBodyException;
@@ -18,8 +19,6 @@ use Assignment\Order\Controller\Form\OrderFormFactory;
 use Assignment\Order\Exception\CannotStoreOrderException;
 use Assignment\Order\OrderFactory;
 use Assignment\Order\OrderInterface;
-use Assignment\Order\Resource\OrderResource;
-use Assignment\Order\Resource\OrderResourceFactory;
 use Assignment\Product\Exception\CannotFindProductException;
 use Exception;
 use Psr\Http\Message\ResponseInterface;
@@ -39,10 +38,9 @@ final class OrderController
             $form = $this->createOrderForm($request);
             $form->validate();
 
-            $calculatedOutcomes = $this->getCalculatedOutcomes($form);
-            $orders = $this->storeCalculatedOrders($calculatedOutcomes, $form);
-            $orderResource = $this->createOrderResource($orders);
-            $formattedInvoice = $this->createInvoiceFormatter($form->getInvoiceFormat(), $orderResource)->getFormattedInvoice();
+            $calculatedOutcome = $this->getCalculatedOutcome($form);
+            $order = $this->storeOrder($calculatedOutcome, $form);
+            $formattedInvoice = $this->createInvoiceFormatter($form->getInvoiceFormat(), $order->getId(), $calculatedOutcome)->getFormattedInvoice();
 
             if ($form->isSendEmail()) {
                 $this->createEmailSender($form, $formattedInvoice)->send();
@@ -57,23 +55,24 @@ final class OrderController
     /**
      * @param array $products
      * @param string $countryCode
-     * @return Calculator
+     * @return AbstractCalculator
      * @throws DbConnectionException
      */
-    private function createCalculator(array $products, string $countryCode): Calculator
+    private function createCalculator(array $products, string $countryCode): AbstractCalculator
     {
         return (new CalculatorFactory())->createCalculator($products, $countryCode);
     }
 
     /**
      * @param string $getInvoiceFormat
-     * @param OrderResource $orderResource
+     * @param string $orderId
+     * @param ConsolidatedCalculationOutcome $consolidatedCalculationOutcome
      * @return FormatterInterface
-     * @throws Exception
+     * @throws InvalidInvoiceFormatException
      */
-    private function createInvoiceFormatter(string $getInvoiceFormat, OrderResource $orderResource): FormatterInterface
+    private function createInvoiceFormatter(string $getInvoiceFormat, string $orderId, ConsolidatedCalculationOutcome $consolidatedCalculationOutcome): FormatterInterface
     {
-        return (new InvoiceFormatterProvider())->getFormatter($getInvoiceFormat, $orderResource);
+        return (new InvoiceFormatterProvider())->getFormatter($getInvoiceFormat, $orderId, $consolidatedCalculationOutcome);
     }
 
     /**
@@ -118,35 +117,27 @@ final class OrderController
     }
 
     /**
-     * @param OrderInterface[] $orders
-     * @return OrderResource
-     */
-    private function createOrderResource(array $orders): OrderResource
-    {
-        return (new OrderResourceFactory())->createOrderResource($orders);
-    }
-
-    /**
      * @param OrderForm $form
-     * @return CalculatedOutcome[]
+     * @return ConsolidatedCalculationOutcome
+     * @throws CannotFindProductException
      * @throws DbConnectionException
      * @throws EmptyRequestBodyException
      * @throws FormValidationFailedException
-     * @throws CannotFindProductException
      */
-    private function getCalculatedOutcomes(OrderForm $form): array
+    private function getCalculatedOutcome(OrderForm $form): ConsolidatedCalculationOutcome
     {
         return $this->createCalculator($form->getProducts(), $form->getCountry())->calculate();
     }
 
+
     /**
-     * @param array $calculatedOutcomes
+     * @param ConsolidatedCalculationOutcome $consolidatedCalculationOutcome
      * @param OrderForm $form
-     * @return OrderInterface[]
+     * @return OrderInterface
      * @throws CannotStoreOrderException
      */
-    private function storeCalculatedOrders(array $calculatedOutcomes, OrderForm $form): array
+    private function storeOrder(ConsolidatedCalculationOutcome $consolidatedCalculationOutcome, OrderForm $form): OrderInterface
     {
-        return (new OrderFactory())->createOrderStorage($calculatedOutcomes, $form)->storeCalculatedOrders();
+        return (new OrderFactory())->createOrderStorage($consolidatedCalculationOutcome, $form)->storeCalculatedOrder();
     }
 }

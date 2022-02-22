@@ -8,32 +8,7 @@ interface OrderInterface
     /**
      * @return string
      */
-    public function getOrderId(): string;
-
-    /**
-     * @return string
-     */
-    public function getProductId(): string;
-
-    /**
-     * @return int
-     */
-    public function getQuantity(): int;
-
-    /**
-     * @return float
-     */
-    public function getBasePrice(): float;
-
-    /**
-     * @return float
-     */
-    public function getTaxPrice(): float;
-
-    /**
-     * @return float
-     */
-    public function getTotalPrice(): float;
+    public function getId(): string;
 
     /**
      * @return string|null

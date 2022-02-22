@@ -11,23 +11,23 @@ class JsonFormatter extends AbstractFormatter implements FormatterInterface
     public function getFormattedInvoice(): string
     {
 
-        $resource = $this->getResource();
+        $consolidatedCalculationOutcome = $this->getConsolidatedCalculationOutcome();
         $outcomes = [];
 
-        foreach ($resource->getOrders() as $key => $order) {
-            $outcomes[$key]['productId'] = $order->getProductId();
-            $outcomes[$key]['quantity'] = $order->getQuantity();
-            $outcomes[$key]['basePrice'] = $order->getBasePrice();
-            $outcomes[$key]['taxPrice'] = $order->getTaxPrice();
-            $outcomes[$key]['totalPrice'] = $order->getTotalPrice();
+        foreach ($consolidatedCalculationOutcome->getProductCalculationOutcomes() as $key => $outcome) {
+            $outcomes[$key]['productId'] = $outcome->getProductId();
+            $outcomes[$key]['quantity'] = $outcome->getQuantity();
+            $outcomes[$key]['basePrice'] = $outcome->getBasePrice();
+            $outcomes[$key]['taxPrice'] = $outcome->getTaxPrice();
+            $outcomes[$key]['totalPrice'] = $outcome->getTotalPrice();
         }
 
         $response = [
             "data" => [
-                "orderId" => $resource->getOrders()[0]->getOrderId(),
+                "orderId" => $this->getOrderId(),
                 "products" => $outcomes,
-                "grandTotalTaxPrice" => $resource->getGrandTotalTaxPrice(),
-                "grandTotal" => $resource->getGrandTotal(),
+                "grandTotalTaxPrice" => $consolidatedCalculationOutcome->getGrandTotalTaxPrice(),
+                "grandTotal" => $consolidatedCalculationOutcome->getGrandTotalPrice(),
             ]
         ];
 

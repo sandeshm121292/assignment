@@ -2,29 +2,42 @@
 
 namespace Assignment\Formatter;
 
-use Assignment\Order\Resource\OrderResource;
+
+use Assignment\Calculator\ConsolidatedCalculationOutcome;
 
 abstract class AbstractFormatter
 {
 
-    /**
-     * @var OrderResource
-     */
-    protected $resource;
+    private $orderId;
 
     /**
-     * @param OrderResource $resource
+     * @var ConsolidatedCalculationOutcome
      */
-    public function __construct(OrderResource $resource)
+    protected $consolidatedCalculationOutcome;
+
+    /**
+     * @param string $orderId
+     * @param ConsolidatedCalculationOutcome $consolidatedCalculationOutcome
+     */
+    public function __construct(string $orderId, ConsolidatedCalculationOutcome $consolidatedCalculationOutcome)
     {
-        $this->resource = $resource;
+        $this->consolidatedCalculationOutcome = $consolidatedCalculationOutcome;
+        $this->orderId = $orderId;
     }
 
     /**
-     * @return OrderResource
+     * @return string
      */
-    protected function getResource(): OrderResource
+    protected function getOrderId(): string
     {
-        return $this->resource;
+        return $this->orderId;
+    }
+
+    /**
+     * @return ConsolidatedCalculationOutcome
+     */
+    protected function getConsolidatedCalculationOutcome(): ConsolidatedCalculationOutcome
+    {
+        return $this->consolidatedCalculationOutcome;
     }
 }

@@ -34,7 +34,7 @@ class OrderControllerTest extends TestCase
         $body = json_encode($requestBody);
 
         $response = $this->dispatchPost('/api/order/create', $body);
-
+        var_dump(json_decode($response->getBody()->getContents(), true));
         self::assertSame(
             200,
             $response->getStatusCode()

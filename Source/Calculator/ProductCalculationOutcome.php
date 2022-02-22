@@ -2,7 +2,7 @@
 
 namespace Assignment\Calculator;
 
-final class CalculatedOutcome
+final class ProductCalculationOutcome
 {
 
     /**

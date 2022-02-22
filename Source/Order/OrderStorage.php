@@ -2,18 +2,19 @@
 
 namespace Assignment\Order;
 
-use Assignment\Calculator\CalculatedOutcome;
+use Assignment\Calculator\ConsolidatedCalculationOutcome;
 use Assignment\Order\Controller\Form\OrderForm;
 use Assignment\Order\Exception\CannotStoreOrderException;
+use Assignment\Order\Item\OrderItemInterface;
 use Exception;
 
 class OrderStorage
 {
 
     /**
-     * @var CalculatedOutcome[]
+     * @var ConsolidatedCalculationOutcome
      */
-    private $calculatedOutcomes;
+    private $consolidatedCalculationOutcome;
 
     /**
      * @var OrderFactory
@@ -26,40 +27,47 @@ class OrderStorage
     private $form;
 
     /**
-     * @param CalculatedOutcome[] $calculatedOutcomes
+     * @param ConsolidatedCalculationOutcome $consolidatedCalculationOutcome
+     * @param OrderFactory $orderFactory
+     * @param OrderForm $form
      */
-    public function __construct(array $calculatedOutcomes, OrderFactory $orderFactory, OrderForm $form)
+    public function __construct(ConsolidatedCalculationOutcome $consolidatedCalculationOutcome, OrderFactory $orderFactory, OrderForm $form)
     {
-        $this->calculatedOutcomes = $calculatedOutcomes;
+        $this->consolidatedCalculationOutcome = $consolidatedCalculationOutcome;
         $this->orderFactory = $orderFactory;
         $this->form = $form;
     }
 
     /**
-     * @return OrderInterface[]
+     * @return OrderInterface
      * @throws CannotStoreOrderException
      */
-    public function storeCalculatedOrders(): array
+    public function storeCalculatedOrder(): OrderInterface
     {
         try {
-            $orders = [];
             $orderId = uniqid('order_');
-            foreach ($this->calculatedOutcomes as $outcome) {
-                $order = $this->orderFactory->createOrder();
-                $order
-                    ->setOrderId($orderId)
+
+            $order = $this->orderFactory->createOrder();
+            $order
+                ->setId($orderId)
+                ->setEmail($this->form->getEmail())
+                ->store();
+
+            foreach ($this->consolidatedCalculationOutcome->getProductCalculationOutcomes() as $outcome) {
+                $orderItem = $this->orderFactory->createOrderItem();
+                $orderItem
+                    ->setOrderId($order->getId())
                     ->setProductId($outcome->getProductId())
                     ->setQuantity($outcome->getQuantity())
                     ->setBasePrice($outcome->getBasePrice())
                     ->setTaxPrice($outcome->getTaxPrice())
                     ->setTotalPrice($outcome->getTotalPrice())
-                    ->setEmail($this->form->getEmail());
-                $orders[] = $order->store();
+                    ->store();
             }
         } catch (Exception $exception) {
             throw CannotStoreOrderException::create($exception);
         }
 
-        return $orders;
+        return $order;
     }
 }

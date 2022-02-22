@@ -2,26 +2,28 @@
 
 namespace Assignment\Formatter;
 
-use Exception;
+use Assignment\Calculator\ConsolidatedCalculationOutcome;
+use Assignment\Formatter\Exception\InvalidInvoiceFormatException;
 
 class InvoiceFormatterProvider
 {
 
     /**
-     * @param $invoiceFormat
-     * @param $resource
+     * @param string $invoiceFormat
+     * @param string $orderId
+     * @param ConsolidatedCalculationOutcome $consolidatedCalculationOutcome
      * @return FormatterInterface
-     * @throws Exception
+     * @throws InvalidInvoiceFormatException
      */
-    public function getFormatter($invoiceFormat, $resource): FormatterInterface
+    public function getFormatter(string $invoiceFormat, string $orderId, ConsolidatedCalculationOutcome $consolidatedCalculationOutcome): FormatterInterface
     {
         switch ($invoiceFormat) {
             case 'json':
-                return new JsonFormatter($resource);
+                return new JsonFormatter($orderId, $consolidatedCalculationOutcome);
             case 'html':
-                return new HtmlFormatter($resource);
+                return new HtmlFormatter($orderId, $consolidatedCalculationOutcome);
             default:
-                throw new Exception('Invalid invoice format');
+                throw InvalidInvoiceFormatException::create($invoiceFormat);
         }
     }
 }
